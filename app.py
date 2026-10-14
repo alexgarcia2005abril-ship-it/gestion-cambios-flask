@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+from matplotlib.pyplot import title
 
 app = Flask(__name__)
 
@@ -19,13 +20,14 @@ def add_task():
     title = request.form.get('title')
     cost_raw = request.form.get('cost')
 
-    # BUG 2: Permite títulos vacíos y almacena cost como string sin convertir a entero
+    cost = float(cost_raw)
+
     new_id = len(tasks) + 1
     tasks.append({
-        "id": new_id,
-        "title": title,
-        "cost": cost_raw
-    })
+    "id": new_id,
+    "title": title,
+    "cost": cost
+})
     return redirect(url_for('index'))
 
 @app.route('/task/delete/<int:task_id>', methods=['POST'])
