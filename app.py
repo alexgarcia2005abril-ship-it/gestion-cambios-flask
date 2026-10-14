@@ -16,16 +16,31 @@ def index():
 
 @app.route('/task/add', methods=['POST'])
 def add_task():
-    title = request.form.get('title')
-    cost_raw = request.form.get('cost')
+    title = (request.form.get('title') or '').strip()
+    cost_raw = (request.form.get('cost') or '').strip()
 
-    # BUG 2: Permite títulos vacíos y almacena cost como string sin convertir a entero
+    if not title:
+        return redirect(url_for('index'))
+
+    if any(caracter.isdigit() for caracter in title):
+        return redirect(url_for('index'))
+
+    try:
+        cost = float(cost_raw)
+    except (TypeError, ValueError):
+        return redirect(url_for('index'))
+
+    if cost < 0:
+        return redirect(url_for('index'))
+
     new_id = len(tasks) + 1
+
     tasks.append({
         "id": new_id,
         "title": title,
-        "cost": cost_raw
+        "cost": cost
     })
+
     return redirect(url_for('index'))
 
 @app.route('/task/delete/<int:task_id>', methods=['POST'])
